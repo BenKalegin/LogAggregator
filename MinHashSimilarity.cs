@@ -92,7 +92,7 @@ namespace LogEntryClustering
 		/// <returns>similar document Id or -1</returns>
 		public int LookForSimilarDocument(string doc, int docId)
 		{
-            var tokens = doc.Split(' ', '\t', '\r', '\n').Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => CleanseToken(t)).ToArray();
+            var tokens = doc.Split(' ', '\t', '\r', '\n', ':', '~', ',', ';', '=', '-', '_').Where(t => !string.IsNullOrWhiteSpace(t)).Select(CleanseToken).ToArray();
             int[] minHashes = minHash.ComputeSketch(tokens);
 			var bandHashes = new string[bands];
 			HashSet<int[]> comparedSketches = new HashSet<int[]>();
@@ -137,7 +137,7 @@ namespace LogEntryClustering
 
         private string CleanseToken(string raw)
         {
-            if (raw.All(c => "0123456789:;()[]{}|<>,./?".Contains(c)))
+            if (raw.All(c => "0123456789:;()[]{}|<>,./?~-=_".Contains(c)))
                 return "<SPECIAL>";
             return raw;
         }

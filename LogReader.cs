@@ -20,7 +20,7 @@ namespace LogEntryClustering
 
         async IAsyncEnumerable<string> ILogReader.ReadNextLine()
         {
-            using var reader = new StreamReader(ZookeeperFileName);
+            using var reader = new StreamReader(WindowsFileName);
             string line;
             while ((line = await reader.ReadLineAsync()) != null)
                 yield return line;

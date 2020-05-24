@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LogEntryClustering
@@ -8,8 +11,6 @@ namespace LogEntryClustering
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("LSH Test.");
-
             await new LshTest().Run();
         }
     }
@@ -18,39 +19,50 @@ namespace LogEntryClustering
     {
         public async Task Run()
         {
+            Console.WriteLine("LSH Test. Program reads the log file and aggregate log by similarity.");
+
             var lsh = new MinHashSimilarity(0.7, new TokenMaskingNgramGeneratorAndHasher(3, 1), 400, 20, 20);
             
             ILogReader logReader = new LogReader();
-            var hit = 0;
-            var miss = 0;
-            int lineNum = 0;
-            var docsForDemo = new List<string>();
-
+            int lineNum = -1;
+            var histogramByOriginalId = new ConcurrentDictionary<int, int>();
+            var lineById = new ConcurrentDictionary<int, string>();
 
             await foreach (string line in logReader.ReadNextLine())
             {
-                // lock to prevent console color race condition
-                lock (this)
+                var currentDocId = Interlocked.Increment(ref lineNum);
                 {
-                    var similarId = lsh.LookForSimilarDocument(line, lineNum);
-                    docsForDemo.Add(line);
-                    if (similarId >= 0)
-                        hit++;
-                    else
-                        miss++;
-                    Console.ForegroundColor = similarId >= 0 ? ConsoleColor.DarkGray : ConsoleColor.White;
-                    Console.WriteLine(line);
+                    var similarId = lsh.LookForSimilarDocument(line, currentDocId);
                     if (similarId >= 0)
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine(docsForDemo[similarId]);
+                        histogramByOriginalId.AddOrUpdate(similarId, 1,  (key, value) => value + 1);
                     }
-
-                    lineNum++;
+                    else
+                    {
+                        if (!histogramByOriginalId.TryAdd(currentDocId, 1))
+                            throw new Exception("Should be first histogram entry");
+                        lineById[currentDocId] = line;
+                    }
+                    Console.Write(similarId < 0 ? "O" : "o");
                 }
             }
-            Console.ResetColor();
-            Console.WriteLine($"hit/miss:{hit}/{miss}");
+
+            var hits = histogramByOriginalId.Where(pair => pair.Value > 1).Sum(pair => pair.Value);
+            var miss = histogramByOriginalId.Count(pair => pair.Value == 1);
+
+            Console.WriteLine("");
+            Console.WriteLine($"Duplicates found (hit count {hits}, total lines {lineNum}, hit ratio: {1.0 * hits/(hits+miss):F}):");
+            Console.WriteLine("");
+
+            foreach (var count in histogramByOriginalId.OrderByDescending(pair => pair.Value).Where(pair => pair.Value > 1)) 
+                Console.WriteLine($"{count.Value:D3} of | {lineById[count.Key]}");
+
+
+            Console.WriteLine("");
+            Console.WriteLine($"Unique records ({miss}):");
+            Console.WriteLine("");
+            foreach (var count in histogramByOriginalId.Where(pair => pair.Value == 1))
+                Console.WriteLine($"1 of | {lineById[count.Key]}");
         }
     }
 }
