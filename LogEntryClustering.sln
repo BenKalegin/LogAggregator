@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogEntryClustering", "LogEntryClustering.csproj", "{A3077590-63DB-453A-ADF0-1896ECA6C9E2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3077590-63DB-453A-ADF0-1896ECA6C9E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3077590-63DB-453A-ADF0-1896ECA6C9E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3077590-63DB-453A-ADF0-1896ECA6C9E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3077590-63DB-453A-ADF0-1896ECA6C9E2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F5DBDB29-B5C9-4BB8-8B7E-C4C25C2387D1}
+	EndGlobalSection
+EndGlobal
