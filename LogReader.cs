@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace LogEntryClustering
 {
@@ -10,8 +11,10 @@ namespace LogEntryClustering
 
     class LogReader : ILogReader
     {
-        // todo download and cache
-        const string FileName = "C:\\Users\\Feudo\\Downloads\\logs\\Windows_2k.log.txt";
+        string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+        string DataFolder => Path.GetFullPath(Path.Combine(CurrentDirectory, "..\\..\\..\\data"));
+
+        string FileName => Path.Combine(DataFolder,  "Windows_2k.log.txt");
 
         async IAsyncEnumerable<string> ILogReader.ReadNextLine()
         {

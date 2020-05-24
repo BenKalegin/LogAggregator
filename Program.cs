@@ -23,16 +23,31 @@ namespace LogEntryClustering
             ILogReader logReader = new LogReader();
             var hit = 0;
             var miss = 0;
+            int lineNum = 0;
+            var docsForDemo = new List<string>();
+
 
             await foreach (string line in logReader.ReadNextLine())
             {
-                var similarExists = lsh.LookForSimilarDocument(line);
-                if (similarExists)
-                    hit++; 
-                else 
-                    miss++;
-                Console.ForegroundColor = similarExists ? ConsoleColor.DarkGray : ConsoleColor.White;
-                Console.WriteLine(line);
+                // lock to prevent console color race condition
+                lock (this)
+                {
+                    var similarId = lsh.LookForSimilarDocument(line, lineNum);
+                    docsForDemo.Add(line);
+                    if (similarId < 0)
+                        hit++;
+                    else
+                        miss++;
+                    Console.ForegroundColor = similarId >= 0 ? ConsoleColor.DarkGray : ConsoleColor.White;
+                    Console.WriteLine(line);
+                    if (similarId >= 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine(docsForDemo[similarId]);
+                    }
+
+                    lineNum++;
+                }
             }
             Console.ResetColor();
             Console.WriteLine($"hit/miss:{hit}/{miss}");

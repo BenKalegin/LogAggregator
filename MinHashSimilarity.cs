@@ -31,7 +31,7 @@ namespace LogEntryClustering
 		/// <summary>
 		/// Buckets for LSH comparison
 		/// </summary>
-		private readonly Dictionary<string, List<int[]>> buckets;
+		private readonly Dictionary<string, (int id, List<int[]> hashes)> buckets;
 
 		/// <summary>
 		/// Default Constructor
@@ -74,7 +74,7 @@ namespace LogEntryClustering
 			this.threshold = threshold;
 			this.bands = bands;
 			this.rows = rows;
-			buckets = new Dictionary<string, List<int[]>>();
+			buckets = new Dictionary<string, (int id, List<int[]> hashes)>();
 		}
 
 		/// <summary>
@@ -88,9 +88,9 @@ namespace LogEntryClustering
 		/// <summary>
 		/// Given a string document, looks whether a similar document was already seen
 		/// </summary>
-		/// <param name="doc">The new document to compare to</param>
-		/// <returns>true if a similar document was already seen</returns>
-		public bool LookForSimilarDocument(string doc)
+		/// <param name="doc">The new document to compare to</param>ww
+		/// <returns>similar document Id or -1</returns>
+		public int LookForSimilarDocument(string doc, int docId)
 		{
             var tokens = doc.Split(' ', '\t', '\r', '\n').Where(t => !string.IsNullOrWhiteSpace(t)).ToArray();
             int[] minHashes = minHash.ComputeSketch(tokens);
@@ -102,8 +102,9 @@ namespace LogEntryClustering
 				bandHashes[i] = ComputeBandHash(minHashes, i);
 
 				if (buckets.ContainsKey(bandHashes[i]))
-				{
-					foreach (int[] sketchToCompare in buckets[bandHashes[i]])
+                {
+                    var bucket = buckets[bandHashes[i]];
+                    foreach (int[] sketchToCompare in bucket.hashes)
 					{
 						if (!comparedSketches.Contains(sketchToCompare))
 						{
@@ -111,14 +112,14 @@ namespace LogEntryClustering
                             if (similarity >= threshold)
 							{
 								// Found a similar document
-								return true;
+								return bucket.id;
 							}
 
 							// Avoid comparing two documents twice
 							comparedSketches.Add(sketchToCompare);
 						}
 					}
-				}
+                }
 			}
 
 			// No match found, add document to buckets
@@ -126,12 +127,12 @@ namespace LogEntryClustering
 			{
 				if (!buckets.ContainsKey(bandHashes[i]))
 				{
-					buckets.Add(bandHashes[i], new List<int[]>());
+					buckets.Add(bandHashes[i], (docId, new List<int[]>()));
 				}
-				buckets[bandHashes[i]].Add(minHashes);
+				buckets[bandHashes[i]].hashes.Add(minHashes);
 			}
 
-			return false;
+			return -1;
 		}
 
 		/// <summary>
