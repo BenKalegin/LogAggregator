@@ -34,7 +34,7 @@ namespace LogEntryClustering
                 {
                     var similarId = lsh.LookForSimilarDocument(line, lineNum);
                     docsForDemo.Add(line);
-                    if (similarId < 0)
+                    if (similarId >= 0)
                         hit++;
                     else
                         miss++;
