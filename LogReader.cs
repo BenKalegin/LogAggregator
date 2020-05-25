@@ -6,21 +6,14 @@ namespace LogEntryClustering
 {
     internal interface ILogReader
     {
-        IAsyncEnumerable<string> ReadNextLine();
+        IAsyncEnumerable<string> ReadNextLine(string fileName);
     }
 
     class LogReader : ILogReader
     {
-        // Courtesy of https://github.com/logpai/loghub
-        string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
-        string DataFolder => Path.GetFullPath(Path.Combine(CurrentDirectory, "..\\..\\..\\data"));
-
-        string WindowsFileName => Path.Combine(DataFolder,  "Windows_2k.log.txt");
-        string ZookeeperFileName => Path.Combine(DataFolder, "Zookeeper_2k.log.txt");
-
-        async IAsyncEnumerable<string> ILogReader.ReadNextLine()
+        async IAsyncEnumerable<string> ILogReader.ReadNextLine(string fileName)
         {
-            using var reader = new StreamReader(WindowsFileName);
+            using var reader = new StreamReader(fileName);
             string line;
             while ((line = await reader.ReadLineAsync()) != null)
                 yield return line;
