@@ -1,0 +1,3 @@
+# LogAggregator
+
+![](docs/SignalFabricErrorGrouping.PNG)
