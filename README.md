@@ -1,6 +1,6 @@
 # LogAggregator
 
-When I was looking through the wonderful [presentation of SignalFabric](https://www.usenix.org/sites/default/files/conference/protected-files/opml19_slides_aghajanyan.pdf) I was wondering how does it group error messages having unique chunks inside - like codes or IPs or dates etc. Look into the picture:
+When I was looking through the stunning [presentation of SignalFabric](https://www.usenix.org/sites/default/files/conference/protected-files/opml19_slides_aghajanyan.pdf) I was wondering how does it group error messages having unique chunks inside - like codes or IPs or dates etc. Look into the picture:
 
 ![](docs/SignalFabricErrorGrouping.PNG)
 
@@ -10,9 +10,11 @@ One thought is that they trained masked RNN like BERT transformer to learn on te
 
 I dont have much compute possiblities for myself so I decided to make similar solution using probabilistic data structures - MinHash and LSH.
 
-I spend a weeknd for prototype to use 2K lines logs from [loghub](https://github.com/logpai/loghub) and it gives pretty solid results with hit ratio .92 - .98 on different log files. For example, zookeeper logs:
+I spend a weekend for the prototype to use 2K lines logs from [loghub](https://github.com/logpai/loghub) and it gives pretty solid results with hit ratio .92 - .98 on different log files. For example, zookeeper logs:
 
 ![](docs/ZookeeperAggr.PNG)
+
+I still dont hav emetrics for false positives. Thinking of hummond distance.
 
 I will describe the algorithm in wiki section. What I like about it is that it takes O(1) to O(log(N)) time and space depending on desired false rate.
 
