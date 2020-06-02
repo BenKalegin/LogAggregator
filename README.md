@@ -14,7 +14,8 @@ I spend a weeknd for prototype to use 2K lines logs from [loghub](https://github
 
 ![](docs/ZookeeperAggr.PNG)
 
-I will describe the algorithm in wiki section.
+I will describe the algorithm in wiki section. What I like about it is that it takes O(1) to O(log(N)) time and space depending on desired false rate.
+
 
 
 
