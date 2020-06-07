@@ -14,7 +14,7 @@ I spend a weekend for the prototype to use 2K lines logs from [loghub](https://g
 
 ![](docs/ZookeeperAggr.PNG)
 
-I still dont hav emetrics for false positives. Thinking of hummond distance.
+TODO I still dont hav emetrics for false positives. 
 
 I will describe the algorithm in wiki section. What I like about it is that it takes O(1) to O(log(N)) time and space depending on desired false rate.
 
